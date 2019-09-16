@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: travel-brochure-front-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: travel-brochure-front
+  template:
+    metadata:
+      labels:
+        component: travel-brochure-front
+    spec:
+      containers:
+        - name: travel-brochure-front
+          image: asia.gcr.io/PROJECT_ID/travel-brochure-front:latest
+          resources:
+            limits:
+              cpu: "80m"
+              memory: "200Mi"
+            requests:
+              cpu: "30m"
+              memory: "100Mi"
+          ports:
+            - containerPort: 3000

@@ -1,0 +1,20 @@
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: tabishiyo.com
+spec:
+  secretName: tabishiyo-com-tls
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  commonName: tabishiyo.com
+  dnsNames:
+    - tabishiyo.com
+    - www.tabishiyo.com
+  acme:
+    config:
+      - http01:
+          ingressClass: nginx
+        domains:
+          - tabishiyo.com
+          - www.tabishiyo.com

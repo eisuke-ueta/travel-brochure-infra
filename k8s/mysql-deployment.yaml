@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: travel-brochure-mysql-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: travel-brochure-mysql
+  template:
+    metadata:
+      labels:
+        component: travel-brochure-mysql
+    spec:
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: database-persistent-volume-claim
+      containers:
+        - name: travel-brochure-mysql
+          image: asia.gcr.io/PROJECT_ID/travel-brochure-mysql:latest
+          resources:
+            limits:
+              cpu: "30m"
+              memory: "200Mi"
+            requests:
+              cpu: "20m"
+              memory: "100Mi"
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: /var/lib/mysql
+              subPath: mysql
+          env:
+            - name: MYSQL_USER
+              value: admin
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-password
+                  key: MYSQL_PASSWORD
+            - name: MYSQL_DATABASE
+              value: travel_brochure
+            - name: MYSQL_HOST
+              value: travel-brochure-mysql-cluster-ip-service
+            - name: TZ
+              value: Asia/Tokyo
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-password
+                  key: MYSQL_PASSWORD
+            - name: MYSQL_URI
+              value: mysql://admin:$(MYSQL_PASSWORD)@travel-brochure-mysql-cluster-ip-service:3306/travel_brochure

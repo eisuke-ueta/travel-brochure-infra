@@ -1,0 +1,79 @@
+# version: 2
+
+# defaults: &defaults
+#   working_directory: ~/repo
+#   docker:
+#     - image: circleci/python:3.6-jessie-node-browsers
+
+# filter_only_master: &filter_only_master
+#   filters:
+#     branches:
+#       only: master
+
+# jobs:
+#   install:
+#     <<: *defaults
+#     steps:
+#       - checkout
+#       - restore_cache:
+#           name: Restore Node Package Cache
+#           keys:
+#             - npm-packages-{{ checksum "package.json" }}
+#       - run: npm install
+#       - save_cache:
+#           name: Save Node Package Cache
+#           key: npm-packages-{{ checksum "package.json" }}
+#           paths:
+#             - ~/.cache/npm
+#       - persist_to_workspace:
+#           root: ~/repo
+#           paths:
+#             - ./*
+
+#   test:
+#     <<: *defaults
+#     steps:
+#       - attach_workspace:
+#           at: ~/repo
+#       - run: npm run test
+
+#   build:
+#     <<: *defaults
+#     steps:
+#       - attach_workspace:
+#           at: ~/repo
+#       - setup_remote_docker:
+#           docker_layer_caching: true
+#       - run: echo $DOCKER_PASSWORD | docker login -u $DOCKER_ID --password-stdin
+#       - run: docker build -t $DOCKER_REPOSITORY/travel-brochure-front:latest .
+#       - run: docker push $DOCKER_REPOSITORY/travel-brochure-front:latest
+
+#   deploy:
+#     <<: *defaults
+#     steps:
+#       - attach_workspace:
+#           at: ~/repo
+#       - setup_remote_docker:
+#           docker_layer_caching: true
+#       - run: curl https://sdk.cloud.google.com | bash > /dev/null;
+#       - run: source $HOME/google-cloud-sdk/path.bash.inc
+#       - run: gcloud components update kubectl
+#       - run: gcloud auth activate-service-account --key-file service-account.json
+#       - run: gcloud projects list
+#       - run: echo $DOCKER_PASSWORD | docker login -u $DOCKER_ID --password-stdin
+#       - run: docker build -t $DOCKER_REPOSITORY/travel-brochure-front:latest .
+#       - run: docker push $DOCKER_REPOSITORY/travel-brochure-front:latest
+
+# workflows:
+#   version: 2
+#   test-build-deploy:
+#     jobs:
+#       - install
+#       - test:
+#           requires:
+#             - install
+#       - build:
+#           <<: *filter_only_master
+#           requires:
+#             - install
+#             - test
